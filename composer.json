@@ -29,13 +29,10 @@
     "docs": "https://github.com/jolicode/jane/wiki"
   },
   "require": {
-    "monolog/monolog": "1.0.*",
-    "joli/ternel": "@dev",
-    "joli/ternel-bundle": "@stable",
-    "joli/semver": "^2.0",
-    "joli/package": ">=1.0 <1.1",
-    "acme/foo": "dev-master#2eb0c097"
-  },
+        "easy-slug/easy-slug": "^2.0",
+        "cocur/slugify": "^2.1",
+        "symfony/console": "^3.0"
+   },
   "require-dev": {
     "debug/dev-only": "1.0.*"
   },
