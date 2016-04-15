@@ -51,34 +51,23 @@ class CalculateExpressions extends Command
     }
 
     private function CalcExpr($expr){
-
-        //$result = $this->CalculateOneStatement("T", '&', 'F');
-        //var_dump($result );
-        //die();
-
         //$pattern = '/^()/';
         //$pattern = '/\((.*?)\)/si';
         //$pattern = '/\(+(.*?)\)/';
         //$pattern  = '/\(+(.*?)\)/';
         //$pattern  = '/(?<=\()(.+)(?=\))/is';
         $pattern = '/\(+(.*?)\)/';
-        preg_match($pattern, $expr, $matches);
-
-
         preg_match($pattern, $expr, $matches, PREG_OFFSET_CAPTURE);
-
         $i = 0;
+        /*cat timp mai avem paraneze rulam recursive match*/
         while (is_string($expr) && (strlen($expr)>1)){
             $i++;
             $expr = $this->RecursiveMatch($expr, 0);
-            var_dump($expr);
-
         }
-
         return $expr;
-
     }
     private function RecursiveMatch($expr, $n){
+        /*cat timp noi avem paranteza in paranteza vom merge recursiv ruland tot aceasta functie pe subparanteza gasita*/
         $n++;
         if ($n>5){
             echo 'bucla infinita2'; die();
@@ -87,7 +76,6 @@ class CalculateExpressions extends Command
         $bool_vall = "";
         $pattern = '/\(+(.*?)\)/';
         preg_match($pattern, $expr, $matches, PREG_OFFSET_CAPTURE);
-
         print_r($matches);
         if (count($matches)>0){
             /*in substringul nostru mai avem paranteze*/
@@ -109,7 +97,6 @@ class CalculateExpressions extends Command
             }
             print_r("valoare de dupa str_replace:");
             var_dump($bool_vall);
-
         }
         else{
             /*nu mai avem paranteze*/
@@ -132,6 +119,7 @@ class CalculateExpressions extends Command
     }
 
     private function ValuesWithoutBrackets($expr){
+        /*putem avea o epresie de genul : T&F|F|F - vom mlerge pe fiecare caracter din aceasta expresie si vom calcula pe rand */
         $return_val = "";
         $length = strlen($expr);
         $stored_operator = "";
@@ -141,7 +129,7 @@ class CalculateExpressions extends Command
                     $return_val = $expr[$i];
                 }
                 else{
-                    /*trebuie sa avem prima valoare, operatorul , si urmatoarea valoare - toate necesare pentru calcul*/
+                    /*trebuie sa avem prima valoare, operatorul , si urmatoarea valoare - toate necesare pentru calcul*-*/
                     $return_val = $this->CalculateOneStatement($return_val , $stored_operator, $expr[$i]);
                     if ($return_val){
                         $return_val = "T";
@@ -161,9 +149,9 @@ class CalculateExpressions extends Command
 
 
     private function CalculateOneStatement($first_value, $operator, $second_value){
+        /* aceasta calculeaza doar expresiile cu doua valori*/
         switch ($operator) {
             case "|":
-                //echo "2 inra la sau";
                 return ($this->bool_values[$first_value] || $this->bool_values[$second_value]);
                 break;
             case "&":

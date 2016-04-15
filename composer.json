@@ -14,5 +14,13 @@
   },
   "require-dev": {
     "phpunit/phpunit": "~4.8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Laura\\Expressions\\": "src/"
+    },
+    "psr-0": {
+      "Laura\\Expressions\\": "src/"
+    }
   }
 }
