@@ -70,7 +70,7 @@ class CalculateExpressions extends Command
         /*cat timp noi avem paranteza in paranteza vom merge recursiv ruland tot aceasta functie pe subparanteza gasita*/
         $n++;
         if ($n>11){
-            echo 'bucla infinita2'; die();
+            echo 'bucla infinita2 buclucasa'; die();
         }
         $return_val = "";
         $bool_vall = "";
