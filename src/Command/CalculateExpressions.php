@@ -92,13 +92,13 @@ class CalculateExpressions extends Command
         if (count($matches)>0){
             /*in substringul nostru mai avem paranteze*/
             $return_val = $this->RecursiveMatch($matches[1][0], $n);
-            /*inlocuim resultatul cu informatia din $expr*/ 
+            /*inlocuim resultatul cu informatia din $expr*/
             if (!is_bool($return_val)){
                 if ($return_val=="T"){
                     $return_val = true;
                 }
                 else{
-                    $return_val = false;
+                    $return_val = false; 
                 }
             }
             if ($return_val ){
