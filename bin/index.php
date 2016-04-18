@@ -9,7 +9,7 @@ use Laura\Expressions\Command\CalculateExpressions;
 
 $application = new Application();
 $application->add(new CalculateExpressions());
-$application->run();
+$application->run(); 
 
 //$calc_expr = new Calculate_expression();
 //$espr = "F&((T&F)|T&(F|T))&(F|T)";
