@@ -69,7 +69,7 @@ class CalculateExpressions extends Command
     private function RecursiveMatch($expr, $n){
         /*cat timp noi avem paranteza in paranteza vom merge recursiv ruland tot aceasta functie pe subparanteza gasita*/
         $n++;
-        if ($n>7){
+        if ($n>11){
             echo 'bucla infinita2'; die();
         }
         $return_val = "";
