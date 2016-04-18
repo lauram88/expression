@@ -86,7 +86,7 @@ class CalculateExpressions extends Command
                     $return_val = true;
                 }
                 else{
-                    $return_val = false;
+                    $return_val = false; 
                 }
             }
             if ($return_val ){
