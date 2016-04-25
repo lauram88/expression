@@ -48,87 +48,158 @@ class CalculateExpressions extends Command
         $output->writeln($text);
     }
 
-
+    /*prepara expresia pentru a putea fi calculata prin rpn : Ex: ne transforma o expresie: T&F in TF&*/
     function fixForRpn($expression){
+
         $newExpression = array();
+
         $string = "";
+
         $operandsList = array();
+
         $values = array('T'=>true, 'F'=>false);
+
         $length = strlen($expression);
+
         $i = 0;
+
         $push = true;
+
         while ($i<$length) {
+
             if ($expression[$i]=="(") {
+
                 $push = false;
+
             }elseif ($expression[$i]==")") {
+
                 $push = true;
+
                 $val = array_pop($operandsList);
+
                 array_push($newExpression, $val);
+
                 $string.=$val;
+
                 if (count($operandsList)>0) {
+
                     $val = array_pop($operandsList);
+
                     array_push($newExpression, $val);
+
                     $string.=$val;
+
                 }
+
             }elseif (in_array($expression[$i], array("&", "|"))) {
+
                 array_push($operandsList, $expression[$i]);
+
             }elseif (in_array($expression[$i], array_keys($values))) {
+
                 array_push($newExpression, $expression[$i]);
+
                 $string.=$expression[$i];
+
                 if ($push) {
+
                     $val = array_pop($operandsList);
+
                     if ($val!="") {
+
                         array_push($newExpression, $val);
+
                         $string.=$val;
+
                     }
+
                 }
+
             }
+
             $i++;
+
         }
+
         if (count($operandsList)>0) {
+
             $val = array_pop($operandsList);
+
             array_push($newExpression, $val);
+
             $string.=$val;
+
         }
+
         return $newExpression;
+
     }
 
 
     function reversePolishNotation($params) {
+
         $values = array('T'=>true, 'F'=>false);
+
         $count = sizeof($params);
+
         $result = null;
+
         $valueToAdd = null;
+
         $numeric = array();
 
+
         for($i = 0; $i < $count; $i++) {
+
             if ( in_array( $params[$i], array_keys($values) ) ) {
+
                 $numeric[] = $params[$i];
+
             } else {
-                if (count($numeric)>1){
+
+                if (count($numeric)>1) {
+
                     $pop1 = array_pop($numeric);
+
                     $pop2 = array_pop($numeric);
+
                     switch ($params[$i]) {
                         case "&":
+
                             $result = $values[$pop1] && $values[$pop2];
+
                             break;
                         case "|":
+
                             $result = $values[$pop1] || $values[$pop2];
+
                             break;
                     }
+
                 }
+
                 if ($result) {
+
                     $valueToAdd = "T";
+
                 }else{
+
                     $valueToAdd = "F";
+
                 }
+
                 array_push($numeric, $valueToAdd);
+
             }
+
         }
 
         if ($count==1) {
+
             $valueToAdd = array_pop($numeric);
+
         }
+
         return $valueToAdd;
     }
 
@@ -155,26 +226,24 @@ class CalculateExpressions extends Command
 
         preg_match($pattern, $expr, $matches, PREG_OFFSET_CAPTURE);
 
-        //print_r($matches);
-
         if (count($matches)>0) {
             /*in substringul nostru mai avem paranteze*/
-            $return_val = $this->RecursiveMatch($matches[1][0]);
+            $returnVal = $this->RecursiveMatch($matches[1][0]);
 
             /*inlocuim resultatul cu informatia din $expr*/
-            if (!is_bool($return_val)) {
+            if (!is_bool($returnVal)) {
 
-                if ($return_val=="T") {
+                if ($returnVal=="T") {
 
-                    $return_val = true;
+                    $returnVal = true;
 
                 } else {
 
-                    $return_val = false;
+                    $returnVal = false;
 
                 }
             }
-            if ($return_val ) {
+            if ($returnVal ) {
 
                 $bool_vall= str_replace("(".$matches[1][0].")", "T", $expr );
 
@@ -183,8 +252,10 @@ class CalculateExpressions extends Command
                 $bool_vall = str_replace("(".$matches[1][0].")", "F", $expr );
 
             }
+
             print_r("valoare de dupa str_replace:");
             var_dump($bool_vall);
+
         } else {
             /*nu mai avem paranteze*/
             $bool_vall_result = $this->ValuesWithoutBrackets($expr);
@@ -214,48 +285,50 @@ class CalculateExpressions extends Command
     private function ValuesWithoutBrackets($expr)
     {
         /*putem avea o epresie de genul : T&F|F|F - vom mlerge pe fiecare caracter din aceasta expresie si vom calcula pe rand */
-        $return_val = "";
+        $returnVal = "";
 
         $length = strlen($expr);
 
-        $stored_operator = "";
+        $storedOperator = "";
 
         for ($i = 0; $i < $length; $i++) {
 
             if ( !in_array($expr[$i], array('|', '&') ) ) {
 
-                if ($return_val =="") {
+                if ($returnVal =="") {
 
-                    $return_val = $expr[$i];
+                    $returnVal = $expr[$i];
 
                 } else {
 
                     /*trebuie sa avem prima valoare, operatorul , si urmatoarea valoare - toate necesare pentru calcul*-*/
-                    $return_val = $this->CalculateOneStatement($return_val , $stored_operator, $expr[$i]);
+                    $returnVal = $this->CalculateOneStatement($returnVal , $storedOperator, $expr[$i]);
 
-                    if ($return_val) {
+                    if ($returnVal) {
 
-                        $return_val = "T";
+                        $returnVal = "T";
 
                     } else {
 
-                        $return_val = "F";
+                        $returnVal = "F";
 
                     }
 
-                    $stored_operator = "";
+                    $storedOperator = "";
 
                 }
             } else {
 
-                $stored_operator  = $expr[$i];
+                $storedOperator  = $expr[$i];
 
             }
         }
-        return $return_val;
+
+        return $returnVal;
+
     }
 
-    private function CalculateOneStatement($first_value, $operator, $second_value)
+    private function CalculateOneStatement($firstValue, $operator, $secondValue)
     {
 
         /* aceasta calculeaza doar expresiile cu doua valori*/
@@ -263,13 +336,13 @@ class CalculateExpressions extends Command
 
             case "|":
 
-                return ($this->boolValues[$first_value] || $this->boolValues[$second_value]);
+                return ($this->boolValues[$firstValue] || $this->boolValues[$secondValue]);
 
                 break;
 
             case "&":
 
-                return ($this->boolValues[$first_value] && $this->boolValues[$second_value]);
+                return ($this->boolValues[$firstValue] && $this->boolValues[$secondValue]);
 
                 break;
 
@@ -279,6 +352,7 @@ class CalculateExpressions extends Command
 
                 return true;
         }
+
     }
 
 }
