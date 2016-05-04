@@ -33,6 +33,7 @@ class CalculateExpressions extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+
         $expression = $input->getArgument('expression');
 
         $expression = $this->fixForRpn($expression);
