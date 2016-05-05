@@ -56,6 +56,12 @@ class CalculateExpressions extends Command
 
         $string = "";
 
+        $bracketsLevel = 0;
+
+        $operandsOnLevel = array();
+
+        $valuesOnLevel = array();
+
         $operandsList = array();
 
         $values = array('T'=>true, 'F'=>false);
@@ -71,6 +77,8 @@ class CalculateExpressions extends Command
             if ($expression[$i]=="(") {
 
                 $push = false;
+
+                $bracketsLevel++;
 
             }elseif ($expression[$i]==")") {
 
@@ -92,15 +100,53 @@ class CalculateExpressions extends Command
 
                 }
 
+                $bracketsLevel--;
+
+
             }elseif (in_array($expression[$i], array("&", "|"))) {
 
+                /*verificam daca mai avem operanzi pe acest nivel si daca avem il scoatem pe ultimul inainte de a trece la urmatorul nivel de paranteze;*/
+                if ( (isset($operandsOnLevel[$bracketsLevel]) and ($operandsOnLevel[$bracketsLevel]>0) ) and (isset($valuesOnLevel[$bracketsLevel]) and ($valuesOnLevel[$bracketsLevel]>1) )) {
+                    $val = array_pop($operandsList);
+
+                    if ($val!="") {
+
+                        array_push($newExpression, $val);
+
+                        $string.=$val;
+
+                        $operandsOnLevel[$bracketsLevel]--;
+
+                    }
+                }
+
                 array_push($operandsList, $expression[$i]);
+
+                if (!isset($operandsOnLevel[$bracketsLevel])) {
+
+                    $operandsOnLevel[$bracketsLevel] = 1;
+
+                }else{
+
+                    $operandsOnLevel[$bracketsLevel]++;
+
+                }
 
             }elseif (in_array($expression[$i], array_keys($values))) {
 
                 array_push($newExpression, $expression[$i]);
 
                 $string.=$expression[$i];
+
+                if (!isset($valuesOnLevel[$bracketsLevel])) {
+
+                    $valuesOnLevel[$bracketsLevel] = 1;
+
+                }else{
+
+                    $valuesOnLevel[$bracketsLevel]++;
+
+                }
 
                 if ($push) {
 
