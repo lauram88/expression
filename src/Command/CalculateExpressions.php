@@ -38,11 +38,18 @@ class CalculateExpressions extends Command
 
         $expression = $this->fixForRpn($expression);
 
-        $result = $this->reversePolishNotation($expression);
-
-        if ($result=="") {
+        if ($expression=="") {
             $result = "Please verify if the expression you asked for is correct ( Eg: (F&(T&F))|T&(F|T)&F|T  ; T|F&T&(F|T&(T|F)) )";
+        }else{
+            $result = $this->reversePolishNotation($expression);
+
+            if ($result=="") {
+                $result = "Please verify if the expression you asked for is correct ( Eg: (F&(T&F))|T&(F|T)&F|T  ; T|F&T&(F|T&(T|F)) )";
+            }
         }
+
+
+        
 
         $text = 'Final Answer: '.$result ;
 
@@ -64,6 +71,8 @@ class CalculateExpressions extends Command
 
         $operandsList = array();
 
+        $lasValueEval = 0;/*0- boolean value, 1- operand*/
+
         $values = array('T'=>true, 'F'=>false);
 
         $length = strlen($expression);
@@ -71,6 +80,8 @@ class CalculateExpressions extends Command
         $i = 0;
 
         $push = true;
+
+        $wrongExpr = false;
 
         while ($i<$length) {
 
@@ -104,7 +115,9 @@ class CalculateExpressions extends Command
 
 
             }elseif (in_array($expression[$i], array("&", "|"))) {
-
+                if ($lasValueEval==2){
+                    $wrongExpr = true;
+                }
                 /*verificam daca mai avem operanzi pe acest nivel si daca avem il scoatem pe ultimul inainte de a trece la urmatorul nivel de paranteze;*/
                 if ( (isset($operandsOnLevel[$bracketsLevel]) and ($operandsOnLevel[$bracketsLevel]>0) ) and (isset($valuesOnLevel[$bracketsLevel]) and ($valuesOnLevel[$bracketsLevel]>1) )) {
                     $val = array_pop($operandsList);
@@ -132,7 +145,13 @@ class CalculateExpressions extends Command
 
                 }
 
+                $lasValueEval = 2;
+
             }elseif (in_array($expression[$i], array_keys($values))) {
+
+                if ($lasValueEval==1){
+                    $wrongExpr = true;
+                }
 
                 array_push($newExpression, $expression[$i]);
 
@@ -161,7 +180,10 @@ class CalculateExpressions extends Command
                     }
 
                 }
+                $lasValueEval = 1;
 
+            }else{
+                return "";
             }
 
             $i++;
@@ -178,6 +200,10 @@ class CalculateExpressions extends Command
 
         }
 
+        if ( ($bracketsLevel!=0) or ($wrongExpr) ) {
+            /*a uitat cel putin o paranteza*/
+            $newExpression = "";
+        }
         return $newExpression;
 
     }
